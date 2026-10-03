@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ron Buster</title>
+  <meta name="description" content="Ron Buster: Janey can't win. A no-timer block puzzle with holiday themes.">
+  <meta name="theme-color" content="#120f2a">
+  <meta property="og:title" content="Ron Buster: Janey can't win">
+  <meta property="og:description" content="A no-timer block puzzle with holiday themes.">
+  <meta property="og:image" content="ron.jpg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Ron Buster">
+  <link rel="apple-touch-icon" href="ron.jpg">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧱</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+
+  <main class="app">
+    <header class="top">
+      <a class="home" href="https://more-ron.com" title="Back to more-ron.com"><img class="avatar" src="ron.jpg" alt="Ron in a top hat"></a>
+      <div class="titles">
+        <h1>Ron Buster</h1>
+        <p>Janey can't win</p>
+      </div>
+      <button id="theme-btn" class="icon-btn" aria-label="Change theme">🎩</button>
+    </header>
+
+    <section class="scores">
+      <div class="score-box">
+        <span class="label">Score</span>
+        <span id="score" class="score">0</span>
+      </div>
+      <div id="combo" class="combo" aria-live="polite"></div>
+      <div class="score-box right">
+        <span class="label">Best</span>
+        <span id="best" class="best">0</span>
+      </div>
+    </section>
+
+    <div class="board-wrap"><canvas id="game" aria-label="Game board. Drag pieces from the tray onto the board."></canvas></div>
+
+    <nav class="toolbar">
+      <button id="undo-btn" class="tool"><span>↩️</span> Undo</button>
+      <button id="new-btn" class="tool"><span>🔄</span> New game</button>
+      <button id="sound-btn" class="tool"><span>🔊</span> Sound</button>
+    </nav>
+  </main>
+
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <div id="theme-sheet" class="overlay" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="theme-title">
+      <div class="sheet-head">
+        <h2 id="theme-title">Pick a theme</h2>
+        <button class="icon-btn small" data-close aria-label="Close">✕</button>
+      </div>
+      <div id="theme-list" class="theme-list"></div>
+    </div>
+  </div>
+
+  <div id="confirm" class="overlay" hidden>
+    <div class="card" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <h2 id="confirm-title">Start a new game?</h2>
+      <p class="muted">Your current score will be lost.</p>
+      <div class="row">
+        <button class="btn ghost" data-close>Keep playing</button>
+        <button id="confirm-yes" class="btn">New game</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="over" class="overlay" hidden>
+    <div class="card" role="dialog" aria-modal="true" aria-labelledby="over-title">
+      <img class="avatar big" src="ron.jpg" alt="">
+      <h2 id="over-title">No more moves!</h2>
+      <div class="final">
+        <span class="label">Score</span>
+        <span id="final-score" class="score">0</span>
+        <span id="new-best" class="badge" hidden>🏆 New best!</span>
+      </div>
+      <p id="janey" class="janey"></p>
+      <button id="again-btn" class="btn">Play again</button>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
