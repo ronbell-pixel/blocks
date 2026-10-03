@@ -7,15 +7,26 @@
     "node": "22.x"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently -k -n server,client \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "tsx watch server/index.ts",
+    "dev:client": "vite",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview",
+    "start": "tsx server/index.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
   "devDependencies": {
     "typescript": "^7.0.2",
     "vite": "^8.3.2",
-    "vitest": "^5.0.3"
+    "vitest": "^5.0.3",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^26.6.4",
+    "concurrently": "^10.0.5"
+  },
+  "dependencies": {
+    "@fastify/static": "^10.1.5",
+    "better-sqlite3": "^13.0.3",
+    "fastify": "^5.12.5",
+    "tsx": "^4.23.15"
   }
 }

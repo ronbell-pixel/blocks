@@ -1,7 +1,7 @@
 // Draws the board and the tray of pieces on one canvas, and handles drag and drop.
 
-import { canPlace, fitsAnywhere, idx, linesCompletedBy, shapeOf, SIZE, EMPTY, type GameState, type PlaceResult } from './game';
-import type { Shape } from './pieces';
+import { canPlace, fitsAnywhere, idx, linesCompletedBy, shapeOf, SIZE, EMPTY, type GameState, type PlaceResult } from '../shared/game.ts';
+import type { Shape } from '../shared/pieces.ts';
 import type { BlockStyle, Theme } from './themes';
 
 interface Layout {

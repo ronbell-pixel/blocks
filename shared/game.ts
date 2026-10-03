@@ -1,31 +1,40 @@
 // Pure game rules: board, dealing, placement, line clears, scoring, game over.
-// No DOM here, so it is easy to test.
+// No DOM here. The browser and the server both use this file: the server
+// replays a finished game's moves from its seed to verify the score.
 
-import { randomShape, SHAPE_BY_ID, type Shape } from './pieces';
+import { randomShape, SHAPE_BY_ID, type Shape } from './pieces.ts';
+import { rngFrom } from './rng.ts';
 
 export const SIZE = 8;
 export const COLORS = 7;
 export const EMPTY = -1;
 const COMBO_GRACE = 3; // placements without a clear before the combo resets
 const BOARD_CLEAR_BONUS = 300;
+export const MAX_MOVES = 20_000;
 
 export interface Piece {
   shapeId: string;
   color: number;
 }
 
+/** A placement [trayIndex, row, col], or 'u' for the one undo. */
+export type Move = [number, number, number] | 'u';
+
 export interface GameState {
+  seed: number;
+  rng: number; // current random state; advances whenever pieces are dealt
   board: number[]; // SIZE*SIZE color indexes, EMPTY when open
   tray: (Piece | null)[];
   score: number;
   combo: number;
   movesSinceClear: number;
+  moves: Move[];
   undoUsed: boolean;
   undo: Snapshot | null;
   over: boolean;
 }
 
-type Snapshot = Pick<GameState, 'board' | 'tray' | 'score' | 'combo' | 'movesSinceClear'>;
+type Snapshot = Pick<GameState, 'rng' | 'board' | 'tray' | 'score' | 'combo' | 'movesSinceClear'>;
 
 export interface PlaceResult {
   state: GameState;
@@ -89,14 +98,19 @@ export function deal(board: number[], rng: () => number): Piece[] {
   return tray;
 }
 
-export function newGame(rng: () => number = Math.random): GameState {
+export function newGame(seed: number): GameState {
   const board = new Array(SIZE * SIZE).fill(EMPTY);
+  const rng = rngFrom(seed);
+  const tray = deal(board, rng.next);
   return {
+    seed: seed >>> 0,
+    rng: rng.state,
     board,
-    tray: deal(board, rng),
+    tray,
     score: 0,
     combo: 0,
     movesSinceClear: 0,
+    moves: [],
     undoUsed: false,
     undo: null,
     over: false,
@@ -111,19 +125,14 @@ export function clearPoints(lines: number, combo: number): number {
   return lines === 0 ? 0 : 10 * lines * lines * Math.max(1, combo);
 }
 
-export function place(
-  state: GameState,
-  trayIndex: number,
-  row: number,
-  col: number,
-  rng: () => number = Math.random,
-): PlaceResult | null {
+export function place(state: GameState, trayIndex: number, row: number, col: number): PlaceResult | null {
   const piece = state.tray[trayIndex];
-  if (!piece || state.over) return null;
+  if (!piece || state.over || state.moves.length >= MAX_MOVES) return null;
   const shape = shapeOf(piece);
   if (!canPlace(state.board, shape, row, col)) return null;
 
   const snapshot: Snapshot = {
+    rng: state.rng,
     board: state.board,
     tray: state.tray,
     score: state.score,
@@ -160,14 +169,22 @@ export function place(
 
   let tray = state.tray.slice();
   tray[trayIndex] = null;
-  if (tray.every((p) => p === null)) tray = deal(board, rng);
+  let rngState = state.rng;
+  if (tray.every((p) => p === null)) {
+    const rng = rngFrom(rngState);
+    tray = deal(board, rng.next);
+    rngState = rng.state;
+  }
 
   const next: GameState = {
+    seed: state.seed,
+    rng: rngState,
     board,
     tray,
     score: state.score + points,
     combo,
     movesSinceClear,
+    moves: [...state.moves, [trayIndex, row, col]],
     undoUsed: state.undoUsed,
     undo: state.undoUsed ? null : snapshot,
     over: false,
@@ -181,15 +198,35 @@ export function canUndo(state: GameState): boolean {
   return !state.undoUsed && state.undo !== null;
 }
 
+/** Undo the last placement. Restoring the random state means undo can't fish for a better deal. */
 export function undo(state: GameState): GameState {
   if (!canUndo(state)) return state;
-  return { ...state, ...state.undo!, undo: null, undoUsed: true, over: false };
+  return { ...state, ...state.undo!, moves: [...state.moves, 'u'], undo: null, undoUsed: true, over: false };
+}
+
+/** Replay a game from its seed. Returns null if any move is illegal. */
+export function replay(seed: number, moves: unknown): GameState | null {
+  if (!Array.isArray(moves) || moves.length > MAX_MOVES) return null;
+  let state = newGame(seed);
+  for (const m of moves) {
+    if (m === 'u') {
+      if (!canUndo(state)) return null;
+      state = undo(state);
+      continue;
+    }
+    if (!Array.isArray(m) || m.length !== 3 || !m.every((n) => Number.isInteger(n))) return null;
+    const result = place(state, m[0], m[1], m[2]);
+    if (!result) return null;
+    state = result.state;
+  }
+  return state;
 }
 
 /** Restore a saved game, returning null if it looks wrong (e.g. saved by an older version). */
 export function revive(raw: unknown): GameState | null {
   const s = raw as GameState;
-  if (!s || !Array.isArray(s.board) || s.board.length !== SIZE * SIZE || !Array.isArray(s.tray)) return null;
+  if (!s || typeof s.seed !== 'number' || typeof s.rng !== 'number' || !Array.isArray(s.moves)) return null;
+  if (!Array.isArray(s.board) || s.board.length !== SIZE * SIZE || !Array.isArray(s.tray)) return null;
   if (s.tray.some((p) => p !== null && !SHAPE_BY_ID.has(p.shapeId))) return null;
   if (s.undo && s.undo.tray.some((p) => p !== null && !SHAPE_BY_ID.has(p.shapeId))) return null;
   return s;

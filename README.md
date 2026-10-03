@@ -1,6 +1,6 @@
 # 🧱 Ron Buster — Janey can't win
 
-A no-timer block puzzle with holiday themes. Play at **https://blocks.more-ron.com**.
+A no-timer block puzzle with holiday themes and a friends leaderboard. Play at **https://blocks.more-ron.com**.
 
 ## How to play
 
@@ -37,26 +37,39 @@ Every theme is one entry in `src/themes.ts`: colors, block style, background dec
 emojis, sounds and the game-over Janey lines. Copy an entry, change the values, and add a
 date window in `autoThemeId()` if it should show automatically.
 
+## Friends leaderboard
+
+Like Slot Party, players pick their name (no password) and an emoji. Signed-in games are
+ranked on **Today**, **This week** and **All time** boards (days start at midnight Central).
+Guests can still play; their games just aren't ranked.
+
+Scores can't be faked from the browser: when a ranked game starts, the server hands out a
+random **seed**, and the pieces you're dealt all come from it. At game over the browser sends
+the list of moves, and the server replays them with the same rules (`shared/game.ts`) to work
+out the score itself. If a result can't be sent (offline), it's retried on the next visit.
+
 ## Development
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173
-npm test           # game rules and theme dates
-npm run build      # production build in dist/
+npm run dev        # API on :3000, game on http://localhost:5173
+npm test           # game rules, replay checks, server and theme dates
+npm run build      # typecheck + production build in dist/
+npm start          # serves the API and the built game on :3000
 ```
 
-Built with TypeScript and Vite. The board and effects are drawn on canvas, and all
-sound is synthesized with Web Audio.
+- `shared/` — game rules, pieces, seeded random numbers, API types (used by both sides)
+- `server/` — Fastify + SQLite (better-sqlite3): players, games, leaderboard
+- `src/` — the game in the browser: canvas board and effects, themes, Web Audio sound
 
-## Deploying
+## Deploying to Railway
 
-Every push to `main` runs the tests, builds, and publishes to GitHub Pages
-(`.github/workflows/deploy.yml`). One-time setup:
+1. Create a Railway service from this repo. `railway.json` sets the build/start commands
+   and health check.
+2. Add a **volume** (mount path e.g. `/data`). The server stores `blocks.db` in
+   `RAILWAY_VOLUME_MOUNT_PATH`, so players and scores survive redeploys.
+3. Add the custom domain `blocks.more-ron.com` in Railway, then add the CNAME (and TXT
+   verification record) Railway shows you in Cloudflare, with the proxy **off** (DNS only).
 
-1. **Settings → Pages → Source: GitHub Actions**, then set the custom domain to `blocks.more-ron.com`.
-2. In Cloudflare DNS, add `CNAME blocks → ronbell-pixel.github.io` with the proxy **off** (DNS only).
-
-## Planned
-
-- Friends leaderboard, using the same name sign-in as Slot Party.
+Environment variables (all optional): `PORT`, `DATABASE_PATH`, `LOG_LEVEL`,
+`TIME_ZONE` (default `America/Chicago`, used for the "Today" board).

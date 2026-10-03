@@ -133,3 +133,73 @@ button { font: inherit; color: inherit; cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before { animation: none !important; transition: none !important; }
 }
+
+/* Player */
+.player-chip {
+  display: flex; align-items: center; gap: 6px; max-width: 120px;
+  height: 40px; padding: 0 12px; border-radius: 999px;
+  background: var(--panel); border: 1px solid var(--border);
+  font-weight: 600; font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.player-chip .name { overflow: hidden; text-overflow: ellipsis; }
+.tool.icon { flex: 0 0 48px; font-size: 1.1rem; }
+.small { font-size: .9rem; margin: -6px 0 14px; }
+.player-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.player-list:empty { display: none; }
+.player-pick {
+  display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px;
+  background: var(--panel); border: 2px solid transparent; font-weight: 600;
+}
+.player-pick.me { border-color: var(--accent); }
+.join { display: grid; gap: 10px; }
+.join-row { display: flex; gap: 8px; }
+.join-row input {
+  flex: 1; min-width: 0; padding: 12px 16px; border-radius: 999px; font: inherit; font-size: 1rem;
+  background: var(--panel); color: var(--text); border: 1px solid var(--border);
+}
+.join-row .btn { padding: 12px 20px; }
+.avatar-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+.avatar-grid button {
+  aspect-ratio: 1; font-size: 1.3rem; border-radius: 12px;
+  background: var(--panel); border: 2px solid transparent;
+}
+.avatar-grid button[aria-checked="true"] { border-color: var(--accent); }
+.error { color: #ff6b6b; margin: 0; font-weight: 600; }
+.error[hidden] { display: none; }
+.link-btn { background: none; border: none; color: var(--muted); text-decoration: underline; margin-top: 16px; width: 100%; }
+
+/* Leaderboard */
+.tabs { display: flex; gap: 6px; padding: 4px; border-radius: 999px; background: var(--panel); margin-bottom: 14px; }
+.tab { flex: 1; padding: 8px; border-radius: 999px; border: none; background: none; font-weight: 600; color: var(--muted); }
+.tab[aria-selected="true"] { background: var(--accent); color: #fff; }
+.leader-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; min-height: 120px; }
+.leader {
+  display: grid; grid-template-columns: 34px 34px 1fr auto; align-items: center; gap: 8px;
+  padding: 10px 12px; border-radius: 16px; background: var(--panel); border: 2px solid transparent;
+}
+.leader.me { border-color: var(--accent); }
+.leader .pos { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 1.15rem; text-align: center; }
+.leader .face { font-size: 1.5rem; text-align: center; }
+.leader .who { min-width: 0; }
+.leader .who b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.leader .who small { color: var(--muted); }
+.leader .pts { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 1.25rem; }
+.janey-tag { display: inline-block; font-size: .7rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: #ff6b6b; color: #fff; margin-left: 6px; vertical-align: 2px; }
+.leader-empty { text-align: center; color: var(--muted); padding: 30px 10px; }
+.rank { font-weight: 700; margin: -8px 0 4px; min-height: 1.5em; }
+.join { grid-template-columns: minmax(0, 1fr); }
+.avatar-grid button { min-width: 0; padding: 0; }
+.tab { white-space: nowrap; font-size: .9rem; padding: 8px 4px; }
+.row .btn { padding: 14px 12px; white-space: nowrap; }
+.toolbar { gap: 6px; }
+.tool { min-width: 0; padding: 10px 4px; }
+.titles h1, .titles p { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 400px) {
+  .top { gap: 8px; }
+  .avatar { width: 42px; height: 42px; }
+  .top .icon-btn { width: 42px; height: 42px; font-size: 1.3rem; }
+  .titles h1 { font-size: 1.3rem; }
+  .titles p { font-size: .82rem; }
+  .player-chip { max-width: 96px; padding: 0 10px; font-size: .85rem; }
+  .tool { font-size: .85rem; }
+}

@@ -27,6 +27,7 @@
         <h1>Ron Buster</h1>
         <p>Janey can't win</p>
       </div>
+      <button id="player-btn" class="player-chip" aria-label="Change player">Sign in</button>
       <button id="theme-btn" class="icon-btn" aria-label="Change theme">🎩</button>
     </header>
 
@@ -46,8 +47,9 @@
 
     <nav class="toolbar">
       <button id="undo-btn" class="tool"><span>↩️</span> Undo</button>
-      <button id="new-btn" class="tool"><span>🔄</span> New game</button>
-      <button id="sound-btn" class="tool"><span>🔊</span> Sound</button>
+      <button id="new-btn" class="tool"><span>🔄</span> New</button>
+      <button id="leaders-btn" class="tool"><span>🏆</span> Leaders</button>
+      <button id="sound-btn" class="tool icon" aria-label="Sound">🔊</button>
     </nav>
   </main>
 
@@ -84,7 +86,47 @@
         <span id="new-best" class="badge" hidden>🏆 New best!</span>
       </div>
       <p id="janey" class="janey"></p>
-      <button id="again-btn" class="btn">Play again</button>
+      <p id="rank" class="rank"></p>
+      <div class="row">
+        <button id="over-leaders-btn" class="btn ghost">🏆 Leaders</button>
+        <button id="again-btn" class="btn">Play again</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="signin" class="overlay" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="signin-title">
+      <div class="sheet-head">
+        <h2 id="signin-title">Who's playing?</h2>
+        <button class="icon-btn small" data-close aria-label="Close">✕</button>
+      </div>
+      <p class="muted small">Pick your name to get on the friends leaderboard. No password needed.</p>
+      <div id="player-list" class="player-list"></div>
+      <form id="join-form" class="join">
+        <label class="label" for="join-name">New player</label>
+        <div class="join-row">
+          <input id="join-name" maxlength="20" placeholder="Your name" autocomplete="nickname" required>
+          <button class="btn" type="submit">Join</button>
+        </div>
+        <div id="avatar-grid" class="avatar-grid" role="radiogroup" aria-label="Pick an avatar"></div>
+        <p id="join-error" class="error" hidden></p>
+      </form>
+      <button id="guest-btn" class="link-btn" data-close>Play as a guest (not ranked)</button>
+    </div>
+  </div>
+
+  <div id="leaders" class="overlay" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="leaders-title">
+      <div class="sheet-head">
+        <h2 id="leaders-title">🏆 Leaderboard</h2>
+        <button class="icon-btn small" data-close aria-label="Close">✕</button>
+      </div>
+      <div class="tabs" role="tablist">
+        <button class="tab" data-period="today" role="tab">Today</button>
+        <button class="tab" data-period="week" role="tab">This week</button>
+        <button class="tab" data-period="all" role="tab">All time</button>
+      </div>
+      <ol id="leader-list" class="leader-list"></ol>
     </div>
   </div>
 
